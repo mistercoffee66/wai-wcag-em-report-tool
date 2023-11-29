@@ -1,5 +1,6 @@
 <svelte:head>
   <title>{title} | WCAG-EM Report Tool</title>
+  <base href="__BASEPATH__" />
 </svelte:head>
 
 <div class="page-content" id="{pageid}">

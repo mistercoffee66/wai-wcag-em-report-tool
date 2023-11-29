@@ -1,7 +1,10 @@
 import jsonld from '@app/scripts/jsonld.js';
 
 import { writable } from 'svelte/store';
-import { locale } from 'svelte-i18n';
+import {
+  defineMessages,
+  locale,
+} from 'svelte-i18n';
 
 import { version } from '../../package.json';
 import { slugify } from '../scripts/slugify.js';
@@ -10,7 +13,7 @@ import appJsonLdContext, {
   importContext
 } from '@app/data/jsonld/appContext.js';
 import webTechnologies from '@app/data/webtechnologies.json';
-import { downloadFileJSON } from '@app/scripts/files.js';
+import { downloadFileJSON, saveJsonToServer } from '@app/scripts/files.js';
 
 // Import related stores and combine
 import { TestResult } from '@app/stores/earl/resultStore/models.js';
@@ -88,6 +91,7 @@ const evaluationTypes = [
 
 class EvaluationModel {
   constructor() {
+
     this['@context'] = evaluationContext;
     this['@type'] = evaluationTypes[0];
     this['@language'] = 'en';
@@ -139,6 +143,8 @@ class EvaluationModel {
       summary: '',
       title: ''
     };
+//    this.saveToServer();
+//    setInterval(this.saveToServer, 10 * 1000);
   }
 
   reset() {
@@ -281,7 +287,7 @@ class EvaluationModel {
         if (!selectSample) {
           selectSample = {};
         }
-  
+
         language = framedEvaluation.language || 'en';
         locale.set(language);
         wcagVersion = defineScope.wcagVersion || DEFAULT_WCAG_VERSION;
@@ -401,7 +407,7 @@ class EvaluationModel {
               sample.description = sample.description[0];
             }
           });
-          
+
           if(importStructuredSample != undefined && importRandomSample != undefined){
             return {
               STRUCTURED_SAMPLE: importStructuredSample.map((sample) => {
@@ -421,7 +427,7 @@ class EvaluationModel {
               RANDOM_SAMPLE: []
             };
           }
-          
+
         });
 
         //Improved compatibility for older reports
@@ -532,7 +538,7 @@ class EvaluationModel {
                     assertion.result = newResult;
                     assertion.test = newTest;
                     assertions.create(assertion);
-                  
+
                 }
                 })({
                   assertedBy,
@@ -544,8 +550,6 @@ class EvaluationModel {
               }
             });
           });
-
-          console.log($assertions);
 
         unscribeStores();
       });
@@ -592,8 +596,9 @@ class EvaluationModel {
     jsonld
       .compact(this, appJsonLdContext)
       .then((compacted) => {
+        const title = compacted?.defineScope?.scope?.title;
         downloadFileJSON({
-          name: `${compacted.defineScope.scope.title ? slugify(compacted.defineScope.scope.title) + '-': ""}evaluation.json`,
+          name: `${slugify(title)}-evaluation-data.json`,
           type: 'application/json',
           contents: JSON.stringify(compacted)
         });
@@ -603,9 +608,28 @@ class EvaluationModel {
       });
   }
 
+  saveToServer() {
+    jsonld
+      .compact(this, appJsonLdContext)
+      .then((compacted) => {
+        const title = compacted?.defineScope?.scope?.title;
+        if (title) {
+          saveJsonToServer({
+            name: `${slugify(title)}-evaluation-data.json`,
+            type: 'application/json',
+            contents: JSON.stringify(compacted)
+          }).then(result => console.log('saved file to server: ', result));
+        }
+      })
+      .catch((error) => {
+        console.error(`An error occured: “${error.name}”\n${error.message}`);
+      });
+  }
+
 }
 
 const _evaluation = writable(new EvaluationModel());
+//_evaluation.subscribe((value) => console.log(value));
 
 export default (
   [

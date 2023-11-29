@@ -13,17 +13,20 @@ import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 import locales from './src/locales/index.json';
 
-const production = !process.env.ROLLUP_WATCH;
-
+const production = process.env.NODE_ENV === 'prod';
 const BASEPATH = process.env.BASEPATH || '';
+const SERVERPATH = production ? '' : 'http://localhost:3001';
+console.log('**********************************');
+console.log(BASEPATH);
+console.log(production);
 
 export default {
   input: pkg.main,
   output: {
-    sourcemap: true,
+    sourcemap: !production,
     format: 'esm',
     name: pkg.name,
-    dir: `build/bundles`
+    dir: `build/bundles`,
   },
   plugins: [
     svelte({
@@ -33,17 +36,17 @@ export default {
       // a separate file - better for performance
       css: (css) => {
         css.write('main.css');
-      }
+      },
     }),
 
     resolve({
       browser: true,
-      dedupe: ['svelte']
+      dedupe: ['svelte'],
     }),
     commonjs(),
 
     json({
-      compact: production
+      compact: production,
     }),
 
     babel({
@@ -54,37 +57,37 @@ export default {
         [
           '@babel/preset-env',
           {
-            targets: '> 0.25%, not dead, ie 11'
-          }
-        ]
+            targets: '> 0.25%, not dead, ie 11',
+          },
+        ],
       ],
       plugins: [
         '@babel/plugin-syntax-dynamic-import',
         [
           '@babel/plugin-transform-runtime',
           {
-            useESModules: true
-          }
-        ]
-      ]
+            useESModules: true,
+          },
+        ],
+      ],
     }),
 
     mergeJson({
       targets: locales.map((locale) => {
         return {
           src: `src/locales/${locale.lang}/**/*.json`,
-          dest: `src/locales/translations_${locale.lang}.json`
+          dest: `src/locales/translations_${locale.lang}.json`,
         };
       }),
       verbose: false,
       watch: true,
-      wrapWithPath: true
+      wrapWithPath: true,
     }),
 
     alias({
       entries: {
-        '@app': './src'
-      }
+        '@app': './src',
+      },
     }),
 
     copy({
@@ -92,12 +95,12 @@ export default {
         {
           // Styles
           src: 'src/static/css/**/*.css',
-          dest: `build/bundles`
+          dest: `build/bundles`,
         },
         {
           // Images
           src: 'src/static/**/*.{svg,png,jpeg,jpg}',
-          dest: `build/images`
+          dest: `build/images`,
         },
         {
           // index.html
@@ -106,14 +109,27 @@ export default {
           transform: (contents) => {
             let contentsString = contents.toString();
             const buildDate = new Date();
-            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const months = [
+              'January',
+              'February',
+              'March',
+              'April',
+              'May',
+              'June',
+              'July',
+              'August',
+              'September',
+              'October',
+              'November',
+              'December',
+            ];
 
             const replacement = {
               __APP_BUILD_DATE__: `${buildDate.getDate()} ${months[buildDate.getMonth()]} ${buildDate.getFullYear()}`,
               __APP_BUILD_YEAR__: buildDate.getFullYear(),
               __APP_VERSION__: production ? pkg.version : 'DEVELOPMENT',
               __BASEPATH__: BASEPATH,
-              __TITLE__: pkg.name
+              __TITLE__: pkg.name,
             };
 
             let replaceRegexp;
@@ -125,37 +141,37 @@ export default {
               if (Object.prototype.hasOwnProperty.call(replacement, key)) {
                 contentsString = contentsString.replace(
                   replaceRegexp,
-                  replacement[key]
+                  replacement[key],
                 );
               }
             }
 
             return contentsString;
-          }
-        }
-    ],
-      verbose: false
+          },
+        },
+      ],
+      verbose: false,
     }),
 
     replace({
-      __BASEPATH__: BASEPATH
+      __BASEPATH__: BASEPATH,
+      __SERVERPATH__: SERVERPATH
     }),
 
-
     !production &&
-      serve({
-        contentBase: 'build',
-        historyApiFallback: true
-      }),
+    serve({
+      contentBase: 'build',
+      historyApiFallback: true,
+    }),
 
     !production && livereload('build'),
-    production && terser()
+    production && terser(),
   ],
   watch: {
     exclude: [
       'node_modules/**',
       // Exclude _underscore-prefixed.files
-      'src/locales/translations_*.json'
+      'src/locales/translations_*.json',
     ],
-  }
+  },
 };

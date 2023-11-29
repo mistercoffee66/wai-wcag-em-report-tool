@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import scopeStore from './scopeStore';
 
 export const initialSummaryStore = {
   EVALUATION_TITLE: '',
@@ -10,5 +11,6 @@ export const initialSummaryStore = {
 };
 
 const summaryStore = writable({...initialSummaryStore});
+//summaryStore.subscribe((value) => console.log(value));
 
 export default summaryStore;

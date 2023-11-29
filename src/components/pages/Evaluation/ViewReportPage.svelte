@@ -24,7 +24,7 @@
   } from '@app/stores/earl/subjectStore/index.js';
   import assertions from '@app/stores/earl/assertionStore/index.js';
   import { slugify } from '@app/scripts/slugify.js';
-  import { t as t, locale } from 'svelte-i18n';  
+  import { t as t, locale } from 'svelte-i18n';
   import { downloadFileHTML } from '@app/scripts/files.js';
 
   import Button from '@app/components/ui/Button.svelte';
@@ -45,14 +45,14 @@
 
   function handleHTMLDownloadClick() {
     let reportContents = document.getElementById("view-report");
-    
+
     downloadFileHTML({
       contents: reportContents,
       name: htmlFilename,
       type: 'text/html',
       lang: $locale
     });
-  }  
+  }
 
   function handleJSONDownloadClick() {
     updateEvaluation();

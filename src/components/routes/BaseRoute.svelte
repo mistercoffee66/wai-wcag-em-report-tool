@@ -1,12 +1,12 @@
 <!-- @Route:/ -->
 <Router basepath="{basepath}">
+
   <BaseLayout>
     <!-- Components are Pages or nested Routes -->
     <Route path="/"><OverviewPage /></Route>
     <Route path="/evaluation/*"><EvaluationRoute /></Route>
 
     <!-- If anything else, it should hit an error? -->
-    <Route path="/*"><OverviewPage /></Route>
     <Route path="/acknowledgements"><Acknowledgements /></Route>
   </BaseLayout>
 </Router>

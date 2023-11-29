@@ -10,5 +10,6 @@ export const initialScopeStore = {
 };
 
 const scopeStore = writable({...initialScopeStore});
+//scopeStore.subscribe((value) => console.log(value));
 
 export default scopeStore;

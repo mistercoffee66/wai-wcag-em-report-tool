@@ -3,13 +3,13 @@
  *   OverviewPage
  * -->
 <Page title="{TRANSLATED.PAGE_TITLE}" pageid="overview">
-  {#if !$previousVersionMsgDismissed}
-  <div style="background: var(--footer-grey); border: 0; padding: 1em; display: flex; align-items: center" lang="en">
-    <p style="max-width: none; margin: 0;">
-      Welcome to the <a href="https://github.com/w3c/wai-wcag-em-report-tool/wiki/Changelog:-What's-new-in-the-2021-redesign-of-the-WCAG-EM-Report-Tool">updated</a> WCAG-EM Report Tool. You can open your existing reports with this tool. The <a href="https://w3c.github.io/wcag-em-report-tool/">previous version</a> is available, and is no longer supported. 
-    </p>
-    <button on:click="{dismissPreviousVersionMessage}" style="margin-left: 1em;" type="button" class="button-secondary">Dismiss</button>  </div>
-  {/if}
+<!--  {#if !$previousVersionMsgDismissed}-->
+<!--  <div style="background: var(&#45;&#45;footer-grey); border: 0; padding: 1em; display: flex; align-items: center" lang="en">-->
+<!--    <p style="max-width: none; margin: 0;">-->
+<!--      Welcome to the <a href="https://github.com/w3c/wai-wcag-em-report-tool/wiki/Changelog:-What's-new-in-the-2021-redesign-of-the-WCAG-EM-Report-Tool">updated</a> WCAG-EM Report Tool. You can open your existing reports with this tool. The <a href="https://w3c.github.io/wcag-em-report-tool/">previous version</a> is available, and is no longer supported. -->
+<!--    </p>-->
+<!--    <button on:click="{dismissPreviousVersionMessage}" style="margin-left: 1em;" type="button" class="button-secondary">Dismiss</button>  </div>-->
+<!--  {/if}-->
 
   <div class="getting-started">
     <p class="getting-started__intro">
@@ -22,7 +22,7 @@
       </Button>
       <OpenEvaluation />
     </div>
-  </div> 
+  </div>
 
   <ExpandCollapseAll />
 
@@ -68,6 +68,8 @@
 
   const { translate } = getContext('app');
   const navigate = useNavigate();
+
+  window.evaluationStore = evaluationStore;
 
   $: TRANSLATED = {
     BUTTON_NEW_EVALUATION: $translate('UI.NAV.MENU_NEW', {
